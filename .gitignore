@@ -1,0 +1,18 @@
+.vscode/
+assets/
+.env
+.env.prod
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+*.pth
+data/
+*.pkl
+mock-remote/
+uv.lock
+mlruns/
+*.onnx
