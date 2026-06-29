@@ -1,0 +1,29 @@
+services:
+  fashion-fe:
+    container_name: fashion-fe
+    build:
+      context: ./react-fe
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - fashion-bk
+    env_file:
+      - ./react-fe/.env
+    networks:
+      - mizpa-network
+
+  fashion-bk:
+    container_name: fashion-bk
+    build:
+      context: ./flask-api
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - mizpa-network
+
+networks:
+  mizpa-network:
+    external: true
+
