@@ -10,19 +10,19 @@ batch_size = 8
 torch.manual_seed(42)
 
 train_dataset = SpamDataset(
-    csv_file="data/train.csv",
+    csv_file="data/SPAM/train.csv",
     max_length=None,
     tokenizer=tokenizer
 )
 
 val_dataset = SpamDataset(
-    csv_file="data/validation.csv",
+    csv_file="data/SPAM/validation.csv",
     max_length=train_dataset.max_length,
     tokenizer=tokenizer
 )
 
 test_dataset = SpamDataset(
-    csv_file="data/test.csv",
+    csv_file="data/SPAM/test.csv",
     max_length=train_dataset.max_length,
     tokenizer=tokenizer
 )

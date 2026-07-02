@@ -4,7 +4,7 @@ from utils import create_balance_dataset, random_split, download_and_unzip_spam_
 
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00228/smsspamcollection.zip"
 
-root_path = Path(__file__).parent / "data"
+root_path = Path(__file__).parent / "data" / "SPAM"
 zip_path = root_path / "sms_spam_collection.zip"
 extracted_path = root_path / "sms_spam_collection"
 data_file_path = extracted_path / "SMSSpamCollection.tsv"
