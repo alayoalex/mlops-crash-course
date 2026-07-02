@@ -16,3 +16,5 @@ mock-remote/
 uv.lock
 mlruns/
 *.onnx
+
+gpt2/
