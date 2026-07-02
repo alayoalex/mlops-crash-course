@@ -1,5 +1,8 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from gpt_download import download_and_load_gpt2
-from gpt import GPTModel, load_weights_into_gpt
+from gpt.gpt import GPTModel, load_weights_into_gpt
 from gpt_generation import generate_text_simple, text_to_token_ids, token_ids_to_text
 import tiktoken
 

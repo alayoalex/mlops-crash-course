@@ -1,7 +1,9 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
 import tiktoken
-from gpt import GPTModel
+from gpt.gpt import GPTModel
 
 
 def generate_text_simple(model, idx, max_new_tokens, context_size):
@@ -55,7 +57,7 @@ def main():
     model = GPTModel(GPT_CONFIG_124M)
     model.eval()  # disable dropout
 
-    start_context = "Hello, I am"
+    start_context = "Every effort moves you"
 
     tokenizer = tiktoken.get_encoding("gpt2")
     encoded = tokenizer.encode(start_context)
@@ -69,7 +71,7 @@ def main():
     out = generate_text_simple(
         model=model,
         idx=encoded_tensor,
-        max_new_tokens=10,
+        max_new_tokens=30,
         context_size=GPT_CONFIG_124M["context_length"]
     )
     decoded_text = tokenizer.decode(out.squeeze(0).tolist())
