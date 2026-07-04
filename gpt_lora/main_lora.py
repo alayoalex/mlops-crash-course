@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
@@ -6,8 +6,10 @@ from gpt.gpt_download import download_and_load_gpt2
 from gpt.gpt import GPTModel, load_weights_into_gpt
 from gpt.gpt_generation import generate_text_simple, text_to_token_ids, token_ids_to_text
 import tiktoken
-from utils import calc_accuracy_loader, calc_loss_batch
+from utils import calc_accuracy_loader, plot_values
 from data_loader import val_loader, train_loader, test_loader
+from lora_layer import LinearWithLoRA
+from train import train_classifier_simple
 
 tokenizer = tiktoken.get_encoding("gpt2")
 torch.manual_seed(42)
@@ -55,11 +57,54 @@ else:
 
 print("Device:", device)
 
+# train_accuracy = calc_accuracy_loader(train_loader, model, device, num_batches=10)
+# val_accuracy = calc_accuracy_loader(val_loader, model, device, num_batches=10)
+# test_accuracy = calc_accuracy_loader(test_loader, model, device, num_batches=10)
+
+# print(f"Training accuracy: {train_accuracy*100:.2f}%")
+# print(f"Validation accuracy: {val_accuracy*100:.2f}%")
+# print(f"Test accuracy: {test_accuracy*100:.2f}%")
+
+def replace_linear_with_lora(model, rank, alpha):
+    for name, module in model.named_children():
+        if isinstance(module, torch.nn.Linear):
+            # Replace the Linear layer with LinearWithLoRA
+            setattr(model, name, LinearWithLoRA(module, rank, alpha))
+        else:
+            # Recursively apply the same function to child modules
+            replace_linear_with_lora(module, rank, alpha)
+
+replace_linear_with_lora(model, rank=16, alpha=16)
 model.to(device)
 
-train_accuracy = calc_accuracy_loader(train_loader, model, device, num_batches=10)
-val_accuracy = calc_accuracy_loader(val_loader, model, device, num_batches=10)
-test_accuracy = calc_accuracy_loader(test_loader, model, device, num_batches=10)
+#---
+
+start_time = time.time()
+
+torch.manual_seed(123)
+
+optimizer = torch.optim.AdamW(model.parameters(), lr=8e-4, weight_decay=0.1)
+
+num_epochs = 5
+train_losses, val_losses, train_accs, val_accs, examples_seen = train_classifier_simple(
+    model, train_loader, val_loader, optimizer, device,
+    num_epochs=num_epochs, eval_freq=50, eval_iter=5,
+)
+
+end_time = time.time()
+execution_time_minutes = (end_time - start_time) / 60
+print(f"Training completed in {execution_time_minutes:.2f} minutes.")
+
+
+epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
+examples_seen_tensor = torch.linspace(0, examples_seen, len(train_losses))
+
+plot_values(epochs_tensor, examples_seen_tensor, train_losses, val_losses, label="loss")
+
+
+train_accuracy = calc_accuracy_loader(train_loader, model, device)
+val_accuracy = calc_accuracy_loader(val_loader, model, device)
+test_accuracy = calc_accuracy_loader(test_loader, model, device)
 
 print(f"Training accuracy: {train_accuracy*100:.2f}%")
 print(f"Validation accuracy: {val_accuracy*100:.2f}%")

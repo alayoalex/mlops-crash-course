@@ -4,9 +4,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import torch
 from gpt.gpt_download import download_and_load_gpt2
 from gpt.gpt import GPTModel, load_weights_into_gpt
-from gpt.gpt_generation import generate_text_simple, text_to_token_ids, token_ids_to_text
+# from gpt.gpt_generation import generate_text_simple, text_to_token_ids, token_ids_to_text
 import tiktoken
-from utils import calc_accuracy_loader, calc_loss_batch
+from utils import calc_accuracy_loader
 from data_loader import val_loader, train_loader, test_loader
 
 tokenizer = tiktoken.get_encoding("gpt2")
