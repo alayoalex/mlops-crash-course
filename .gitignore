@@ -18,3 +18,4 @@ mlruns/
 *.onnx
 
 gpt2/
+mlflow.db
