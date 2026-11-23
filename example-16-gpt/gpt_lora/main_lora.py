@@ -1,6 +1,8 @@
 import sys, os, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from metrics import count_trainable_params
+
 import torch
 from gpt.gpt_download import download_and_load_gpt2
 from gpt.gpt import GPTModel, load_weights_into_gpt
@@ -74,6 +76,9 @@ def replace_linear_with_lora(model, rank, alpha):
             # Recursively apply the same function to child modules
             replace_linear_with_lora(module, rank, alpha)
 
+trainable, total = count_trainable_params(model)
+print(f"Parámetros entrenables: {trainable:,} / {total:,} ({100*trainable/total:.2f}%)")
+
 replace_linear_with_lora(model, rank=16, alpha=16)
 model.to(device)
 
@@ -86,7 +91,7 @@ torch.manual_seed(123)
 optimizer = torch.optim.AdamW(model.parameters(), lr=8e-4, weight_decay=0.1)
 
 num_epochs = 5
-train_losses, val_losses, train_accs, val_accs, examples_seen = train_classifier_simple(
+train_losses, val_losses, train_accs, val_accs, examples_seen, train_summary = train_classifier_simple(
     model, train_loader, val_loader, optimizer, device,
     num_epochs=num_epochs, eval_freq=50, eval_iter=5,
 )
